@@ -774,8 +774,8 @@ async function printReceipt() {
 
     <hr class="dash">
 
-    <div class="summary-row"><span class="s-label">SUBTOTAL:</span><span class="s-val">$${subtotal.toFixed(2)}</span></div>
-    <div class="summary-row"><span class="s-label">SALE TAX (5%):</span><span class="s-val">$${vat.toFixed(2)}</span></div>
+    <div class="summary-row"><span class="s-label">SubtotalL:</span><span class="s-val">$${subtotal.toFixed(2)}</span></div>
+    <div class="summary-row"><span class="s-label">Vat (5%):</span><span class="s-val">$${vat.toFixed(2)}</span></div>
     <div class="summary-row amount-row"><span class="s-label">AMOUNT:</span><span class="s-val">$${grandTotal.toFixed(2)}</span></div>
 
     <hr class="dash">
