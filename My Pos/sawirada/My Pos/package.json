@@ -1,0 +1,14 @@
+{
+  "name": "harsi-pos-tests",
+  "version": "1.0.0",
+  "description": "Automated test runner for Harsi POS (uses Puppeteer)",
+  "main": "test_runner.js",
+  "scripts": {
+    "test": "node test_runner.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer": "^21.0.0"
+  }
+}

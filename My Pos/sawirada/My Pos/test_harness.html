@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Harsi POS - Test Harness</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h3 style="padding:12px;background:#fff;margin:12px;border-radius:8px;">Test Harness - open the console to see results</h3>
+
+  <script>
+    // Mock fetch to avoid network calls during tests
+    window.fetch = async (url, options) => {
+      console.log('[test harness] fetch called', url, options && options.method);
+      if (options && options.method && options.method.toUpperCase() === 'POST') {
+        return { ok: true, json: async () => ({}) };
+      }
+      return { json: async () => ({ products: window.defaultProducts || [], addins: window._testAddins || [], lastInvoiceId: null }) };
+    };
+
+    // Provide a small set of test add-ins, hadda leh appliesTo (comma-separated -> array)
+    window._testAddins = [
+      { name: 'Extra Shot', price: 0.50, category: 'Coffee', appliesTo: ['Coffee'] },
+      { name: 'Whipped Cream', price: 0.30, category: 'Topping', appliesTo: ['Kobashin', 'Expresso'] }
+    ];
+    // Mark this page as test harness so app can behave accordingly (no blocking alerts)
+    window.__TEST_HARNESS__ = true;
+  </script>
+
+  <!-- Run the full app inside an iframe and drive it from here -->
+  <iframe id="appFrame" src="index.html" style="width:100%;height:720px;border:1px solid #ddd;border-radius:8px;margin:12px 0;"></iframe>
+
+  <script>
+    const iframe = document.getElementById('appFrame');
+    iframe.addEventListener('load', async () => {
+      const w = iframe.contentWindow;
+      // Mark as harness and mock fetch inside iframe to avoid network calls
+      w.__TEST_HARNESS__ = true;
+      w._testAddins = [
+        { name: 'Extra Shot', price: 0.50, category: 'Coffee' },
+        { name: 'Whipped Cream', price: 0.30, category: 'Topping' }
+      ];
+
+      w.fetch = async (url, options) => {
+        console.log('[test harness iframe] fetch called', url, options && options.method);
+        if (options && options.method && options.method.toUpperCase() === 'POST') {
+          return { ok: true, json: async () => ({}) };
+        }
+        return { json: async () => ({ products: w.defaultProducts || [], addins: w._testAddins || [], lastInvoiceId: null }) };
+      };
+
+      // Small delay to let the app initialize
+      await new Promise(r => setTimeout(r, 150));
+
+      // Populate products/addins using app functions
+      try {
+        if (typeof w.loadProducts === 'function') {
+          await w.loadProducts();
+        } else {
+          if (w.defaultProducts) w.allProducts = w.defaultProducts.slice();
+          w.allAddIns = w._testAddins.slice();
+          try { w.renderAddIns(); } catch(e) {}
+          try { w.filterAndRender(); } catch(e) {}
+        }
+      } catch (e) { console.error('Error during harness init:', e); }
+
+      // Run tests in iframe context
+      try {
+        console.log('[test harness] Starting tests inside iframe...');
+        const doc = w.document;
+
+        if (!w.allProducts || w.allProducts.length === 0) {
+          console.warn('[test harness] No products available to test.');
+          return;
+        }
+
+        w.addToCart({ name: w.allProducts[0].name, price: w.allProducts[0].price, category: w.allProducts[0].category, image: w.allProducts[0].image });
+        console.log('Cart subtotal after 1 add:', doc.getElementById('cart-subtotal') ? doc.getElementById('cart-subtotal').textContent : 'N/A');
+
+        w.addToCart({ name: w.allProducts[0].name, price: w.allProducts[0].price, category: w.allProducts[0].category, image: w.allProducts[0].image });
+        console.log('Cart subtotal after 2 adds:', doc.getElementById('cart-subtotal') ? doc.getElementById('cart-subtotal').textContent : 'N/A');
+
+        if (w.allAddIns && w.allAddIns.length) {
+          w.addAddinToCart(w.allAddIns[0]);
+          console.log('Cart subtotal (add-in visible separately):', doc.getElementById('cart-subtotal') ? doc.getElementById('cart-subtotal').textContent : 'N/A');
+        }
+
+        console.log('[test harness] Simulating Order()');
+        await w.handleOrder();
+        console.log('[test harness] After Order: posHistory=', JSON.parse(w.localStorage.getItem('posHistory') || '[]'));
+
+        console.log('[test harness] Re-adding a product then Pay()');
+        w.addToCart({ name: w.allProducts[1].name, price: w.allProducts[1].price, category: w.allProducts[1].category, image: w.allProducts[1].image });
+        await w.handlePay();
+        console.log('[test harness] After Pay: posHistory=', JSON.parse(w.localStorage.getItem('posHistory') || '[]'));
+
+        console.log('[test harness] Tests completed.');
+      } catch (e) {
+        console.error('[test harness] Error during tests:', e);
+      }
+    });
+  </script>
+</body>
+</html>
