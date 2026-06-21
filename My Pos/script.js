@@ -780,7 +780,8 @@ async function printReceipt() {
 
     <hr class="dash">
 
-    <div class="center footer">THANK YOU!</div>
+    <div class="center footer">*712*610924477*$#</div>
+    <div class="center footer">Mahadsanid Macamiil!</div>
 
     <div class="center">
       <svg id="barcode"></svg>
