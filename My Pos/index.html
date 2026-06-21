@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harsi POS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <span class="brand">🏪 Harsi POS</span>
+    <div class="nav-links">
+        <button class="nav-btn active" id="nav-sales"    onclick="showPage('sales-page')">🛒 Sales</button>
+        <button class="nav-btn"        id="nav-orders"   onclick="showPage('orders-page')">📋 Orders</button>
+        <button class="nav-btn"        id="nav-additems" onclick="showPage('additems-page')">➕ Add Item</button>
+    </div>
+</nav>
+
+<div id="sales-page">
+    
+    <div class="top-invoice-search" style="background: #fff; padding: 12px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+        <label for="cartSearchInvInput" style="font-weight: bold; font-size: 14px; color: #333;">Raadi Nambarka (Order / Sale):</label>
+        <input type="number" id="cartSearchInvInput" placeholder="Geli Nambarka (Tusaale: 1001)" style="width: 250px; padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">
+        <button onclick="searchAndLoadToCart()" style="padding: 8px 16px; background: #2c7be5; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">Raadi & Geli Cart</button>
+        <span id="cartSearchStatus" style="font-size: 13px; font-weight: bold;"></span>
+    </div>
+
+    <div class="container">
+
+        <div class="products-section">
+            <div class="top-bar">
+                <input type="text" id="search" placeholder="Search item...">
+            </div>
+
+            <div class="categories">
+                <button class="cat-btn active">All</button>
+                <button class="cat-btn">Coffee</button>
+                <button class="cat-btn">Tea</button>
+                <button class="cat-btn">FastFood</button>
+                <button class="cat-btn">FoodCult</button>
+                <button class="cat-btn">Veg</button>
+            </div>
+
+            <div id="productsGrid" class="products-grid"></div>
+        </div>
+
+        <div class="cart-section">
+            <div class="cart-header-row">
+                <h2>Cart</h2>
+                <button id="clearCartBtn" class="clear-cart-btn" title="Tirtir dhammaan alaabta cart-ka">🗑 Clear</button>
+            </div>
+            
+            <div id="cart-items" class="cart-items-container">
+                <div class="empty-cart">Cart is empty.</div>
+            </div>
+            
+            <div class="cart-summary-details">
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span>$<span id="cart-subtotal">0.00</span></span>
+                </div>
+                <div class="summary-row">
+                    <span>VAT (5%):</span>
+                    <span>$<span id="cart-vat">0.00</span></span>
+                </div>
+                <div class="summary-row grand-total-row">
+                    <span>Grand Total:</span>
+                    <span>$<span id="total">0.00</span></span>
+                </div>
+            </div>
+
+            <button class="checkout-btn" id="orderBtn">Order</button>
+            <button class="pay-btn" id="payBtn">Pay</button>
+            <button class="print-btn">Print Receipt</button>
+        </div>
+
+    </div>
+</div>
+
+<div id="orders-page" style="display:none">
+    <div class="page-content">
+        <h2>Orders & Sales Records</h2>
+        <div id="ordersList"><p class="empty-msg">No records yet.</p></div>
+    </div>
+</div>
+
+<div id="additems-page" style="display:none">
+    <div class="page-content">
+        <h2> Add Item</h2>
+        <input type="text"   id="newName"     placeholder="Product Name">
+        <input type="number" id="newPrice"    placeholder="Price">
+        <input type="text"   id="newCategory" placeholder="Category">
+        <input type="text"   id="newImage"    placeholder="Image URL">
+        <button onclick="addProduct()">Add Product</button>
+    </div>
+</div>
+
+<!-- ADD-INS POPUP (markaa product la taabto) -->
+<div id="addinPopupOverlay" class="addin-popup-overlay" style="display:none;">
+    <div class="addin-popup-box">
+        <h3 id="addinPopupTitle" class="addin-popup-title">Doorso Add-ins</h3>
+        <div id="addinPopupList" class="addin-popup-list"></div>
+        <div class="addin-popup-actions">
+            <button id="addinPopupSkip" class="addin-popup-skip">Ku dar — La'aan Add-ins</button>
+            <button id="addinPopupConfirm" class="addin-popup-confirm">Ku dar Cart-ka</button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
